@@ -60,14 +60,28 @@ def desafio():
 
     @task
     def mi_control():
-        """Control 3, el tuyo."""
-        # TODO: escribe un tercer control. Si algo está mal, usa raise ValueError("...")
-        # Ideas: que cada libro_id exista en datos/libros.csv, que la fecha de
-        # devolución no sea anterior a la de préstamo, o que no falten socios.
-        print("Todavía no hay un tercer control")
+        """Control 3: todo libro_id en abril_limpio debe existir en datos/libros.csv."""
+        prestamos = leer_csv(CARPETA_SALIDA / "abril_limpio.csv")
+        libros = leer_csv(CARPETA_DATOS / "libros.csv")
+
+        ids_libros_validos = {fila["libro_id"].strip() for fila in libros if fila.get("libro_id")}
+        sin_libro = []
+
+        for fila in prestamos:
+            libro_id = (fila.get("libro_id") or "").strip()
+            if not libro_id or libro_id not in ids_libros_validos:
+                sin_libro.append((fila.get("prestamo_id"), libro_id))
+
+        if sin_libro:
+            raise ValueError(
+                f"{len(sin_libro)} préstamos tienen libro_id inválido o inexistente: {sin_libro[:5]}"
+            )
+        print(f"Control 3 correcto: todos los {len(prestamos)} préstamos tienen libro_id válido")
 
     limpio = limpiar(traer())
     limpio >> [control_sin_repetidos(), control_fechas(), mi_control()]
 
 
 desafio()
+
+

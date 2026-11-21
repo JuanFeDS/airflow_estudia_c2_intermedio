@@ -28,6 +28,14 @@ def flujo_lucia():
         """Prepara el archivo de abril para contar."""
         filas = leer_csv(CARPETA_SALIDA / "abril_bruto.csv")
         # TODO 1: quita las filas repetidas (las que tienen el mismo prestamo_id)
+        vistos = set()
+        filas_unicas = []
+        for fila in filas:
+            pid = fila["prestamo_id"]
+            if pid not in vistos:
+                vistos.add(pid)
+                filas_unicas.append(fila)
+        filas = filas_unicas
         escribir_csv(CARPETA_SALIDA / "abril_limpio.csv", filas)
         print(f"Tenía {filas_traidas} filas y quedaron {len(filas)}")
         return len(filas)
@@ -37,7 +45,8 @@ def flujo_lucia():
         """Cuenta los préstamos de «Dune» en abril."""
         filas = leer_csv(CARPETA_SALIDA / "abril_limpio.csv")
         # TODO 2: cuenta las filas donde libro_id sea ID_DUNE e imprime el resultado
-        print(f"Revisé {filas_limpias} filas, pero todavía no cuento «Dune»")
+        total_dune = sum(1 for fila in filas if fila["libro_id"] == ID_DUNE)
+        print(f"Revisé {filas_limpias} filas limpias y hay {total_dune} préstamos de «Dune» en abril")
 
     contar(limpiar(traer()))
 
